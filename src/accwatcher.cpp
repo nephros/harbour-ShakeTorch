@@ -38,6 +38,7 @@ static const QString FLASHLIGHT_INTERFACE(FLASHLIGHT_SERVICE);
 static const QString SETTING_TURN_ON("turnOnOnShake");
 static const QString SETTING_TURN_OFF("turnOffOnShake");
 static const QString SETTING_BRIGHTNESS("changeBrightness");
+static const QString SETTING_DISABLE("disableDetection");
 
 AccWatcher::AccWatcher(QObject *parent) :
     QObject(parent),
@@ -155,6 +156,13 @@ void AccWatcher::updateSettings()
     m_turnOn  = m_config->value(SETTING_TURN_ON,  true).toBool();
     m_turnOff = m_config->value(SETTING_TURN_OFF, true).toBool();
     m_changeBrightness = m_config->value(SETTING_BRIGHTNESS, false).toBool();
+    if (m_config->value(SETTING_DISABLE, false).toBool()) {
+        if (m_shake->isActive())
+            m_shake->stopDetection();
+    } else {
+        if (!m_shake->isActive())
+            m_shake->startDetection();
+    }
     qInfo() << "Read Settings from:" << m_config->path()
             << "\nTurn on flash on shake:" << m_turnOn
             << "\nTurn off flash on shake:" << m_turnOff

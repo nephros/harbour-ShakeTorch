@@ -46,6 +46,7 @@ private:
     bool m_turnOn;
     bool m_turnOff;
     bool m_changeBrightness;
+    bool m_disableDetection;
     int m_brightness = -1;
     QSensorGesture *m_shake;
     MDConfGroup* m_config = nullptr;
