@@ -1,8 +1,9 @@
 TARGET = harbour-shaketorch
 
 QT += sensors dbus
+QT -= gui
 
-CONFIG += qt link_pkgconfig
+CONFIG += qt link_pkgconfig console
 
 PKGCONFIG += mlite5 \
             systemsettings
