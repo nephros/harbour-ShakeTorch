@@ -157,7 +157,7 @@ Page {
 
                 automaticCheck: false
                 checked: serviceActive
-                //% "Activate flashlight control"
+                //% "Activate background service"
                 //: description of the active switch
                 text: qsTrId("settings_shaketorch_active_desc")
                 onClicked: {
@@ -209,10 +209,10 @@ Page {
                 checked: config.disableDetection
                 //% "Disable Detection"
                 //: label of the detection switch
-                text: qsTrId("settings_shaketorch_sensordisable_text")
+                text: qsTrId("settings_shaketorch_sensordisable_desc")
                 //% "While this is active, all gesture detection is disabled."
                 //: description of the detection switch
-                description: qsTrId("settings_shaketorch_sensordisable_desc")
+                description: qsTrId("settings_shaketorch_sensordisable_ldesc")
                 onClicked: config.disableDetection = checked
             }
 

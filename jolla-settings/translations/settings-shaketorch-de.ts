@@ -59,7 +59,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message id="settings_shaketorch_active_desc">
-        <source>Activate flashlight control</source>
+        <source>Activate background service</source>
+        <oldsource>Activate flashlight control</oldsource>
         <extracomment>description of the active switch</extracomment>
         <translation type="unfinished"></translation>
     </message>
@@ -76,6 +77,17 @@
     <message id="settings_shaketorch_bright_text">
         <source>Adjust display brightness</source>
         <extracomment>description of the brightness switch</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="settings_shaketorch_sensordisable_desc">
+        <source>Disable Detection</source>
+        <oldsource>While this is active, all gesture detection is disabled.</oldsource>
+        <extracomment>label of the detection switch</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="settings_shaketorch_sensordisable_ldesc">
+        <source>While this is active, all gesture detection is disabled.</source>
+        <extracomment>description of the detection switch</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
