@@ -141,9 +141,10 @@ void AccWatcher::accChanged()
         if ((m_isOn && m_turnOff) || (!m_isOn && m_turnOn)) {
             QDBusPendingCall call =  iface.asyncCall("toggleFlashlight");
         }
-        if (m_changeBrightness) {
-             handleBrightness();
-        }
+    }
+
+    if (m_changeBrightness) {
+         handleBrightness();
     }
 
     connect(m_shake, SIGNAL(shake()), this, SLOT(accChanged()));
@@ -192,16 +193,21 @@ void AccWatcher::updateSettings()
     m_turnOn  = m_config->value(SETTING_TURN_ON,  true).toBool();
     m_turnOff = m_config->value(SETTING_TURN_OFF, true).toBool();
     m_changeBrightness = m_config->value(SETTING_BRIGHTNESS, false).toBool();
-    if (m_config->value(SETTING_DISABLE, false).toBool()) {
-        if (m_shake->isActive())
-            m_shake->stopDetection();
-    } else {
-        if (!m_shake->isActive())
-            m_shake->startDetection();
-    }
-    qInfo() << "Read Settings from:" << m_config->path()
-            << "\nTurn on flash on shake:" << m_turnOn
-            << "\nTurn off flash on shake:" << m_turnOff
-            << "\nChange brightness on shake:" << m_changeBrightness << "\n";
+    m_disableDetection = m_config->value(SETTING_DISABLE, false).toBool();
+    qInfo() << "Read Settings from:" << qPrintable(m_config->path())
+            << "\n\tTurn on flash on shake:\t\t" << m_turnOn
+            << "\n\tTurn off flash on shake:\t" << m_turnOff
+            << "\n\tChange brightness on shake:\t" << m_changeBrightness
+            << "\n\tSensor detection:\t\t" << ( m_disableDetection ? "disabled" : "enabled" );
 
+    if (m_shake != nullptr) {
+        if (m_disableDetection) {
+            if (m_shake->isActive())
+                m_shake->stopDetection();
+        } else {
+            if (!m_shake->isActive())
+                m_shake->startDetection();
+        }
+        qDebug() << "Sensor detection:\t" << ( (m_shake->isActive()) ? "active" : "inactive" );
+    }
 }
