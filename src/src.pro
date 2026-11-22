@@ -4,7 +4,8 @@ QT += sensors dbus
 
 CONFIG += qt link_pkgconfig
 
-PKGCONFIG += mlite5
+PKGCONFIG += mlite5 \
+            systemsettings
 
 SOURCES += ShakeTorch.cpp \
            accwatcher.cpp

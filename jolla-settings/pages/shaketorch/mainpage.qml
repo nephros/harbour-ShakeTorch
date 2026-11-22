@@ -29,7 +29,7 @@ Page {
         path: "/apps/dev.scarpino/harbour-shaketorch"
         property bool turnOnOnShake: true
         property bool turnOffOnShake: true
-
+        property bool changeBrightness: false
     }
 
     /*
@@ -240,6 +240,24 @@ Page {
                 text: qsTrId("settings_shaketorch_stop_desc")
                 onClicked: config.turnOffOnShake = checked
             }
+
+            TextSwitch {
+                id: briSwitch
+
+                width: parent.width - Theme.horizontalPageMargin
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                checked: config.changeBrightness
+                //% "Adjust display brightness"
+                //: description of the brightness switch
+                text: qsTrId("settings_shaketorch_bright_text")
+                //% "Set brightness to maximum on shake, revert when shaken again"
+                //: description of the brightness switch
+                description: qsTrId("settings_shaketorch_bright_desc")
+                onClicked: config.changeBrightness = checked
+            }
+
+
         }
     }
 }
