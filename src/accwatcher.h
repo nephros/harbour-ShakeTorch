@@ -32,8 +32,6 @@ public:
     explicit AccWatcher(QObject *parent = 0);
     virtual ~AccWatcher();
 
-    void setConfig(const QVariantMap config);
-
 private Q_SLOTS:
     void accChanged();
     void flashStateChanged(bool);
@@ -48,7 +46,7 @@ private:
     bool m_changeBrightness;
     bool m_disableDetection;
     int m_brightness = -1;
-    QSensorGesture *m_shake;
+    QSensorGesture *m_shake = nullptr;
     MDConfGroup* m_config = nullptr;
     DisplaySettings* m_ds = nullptr;
 
