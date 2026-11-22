@@ -30,6 +30,7 @@ Page {
         property bool turnOnOnShake: true
         property bool turnOffOnShake: true
         property bool changeBrightness: false
+        property bool disableDetection: false
     }
 
     /*
@@ -198,6 +199,22 @@ Page {
                 }
             }
 
+            TextSwitch {
+                id: detectSwitch
+
+                width: parent.width - Theme.horizontalPageMargin
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                automaticCheck: false
+                checked: config.disableDetection
+                //% "Disable Detection"
+                //: label of the detection switch
+                text: qsTrId("settings_shaketorch_sensordisable_text")
+                //% "While this is active, all gesture detection is disabled."
+                //: description of the detection switch
+                description: qsTrId("settings_shaketorch_sensordisable_desc")
+                onClicked: config.disableDetection = checked
+            }
 
             SectionHeader {
                 //% "Options"
