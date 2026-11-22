@@ -2,10 +2,15 @@
 Description=ShakeTorch - Shake phone to turn flashlight on
 Requires=dbus.service
 After=dbus.service
+After=dconf.service
+Wants=mce.service
+After=mce.service
+After=pre-user-session.target
+Conflicts=jolla-actdead-charging.service
 
 [Service]
 ExecStart=/usr/bin/harbour-shaketorch
 Restart=always
 
 [Install]
-WantedBy=default.target
+WantedBy=user-session.target
