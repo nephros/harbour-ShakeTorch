@@ -23,6 +23,7 @@
 #include <mlite5/MDConfGroup>
 
 class QSensorGesture;
+class DisplaySettings;;
 
 class AccWatcher : public QObject
 {
@@ -36,14 +37,19 @@ public:
 private Q_SLOTS:
     void accChanged();
     void flashStateChanged(bool);
+    void handleBrightness();
+
     void updateSettings();
     void updateSetting(const QString& key);
 
 private:
     bool m_turnOn;
     bool m_turnOff;
+    bool m_changeBrightness;
+    int m_brightness = -1;
     QSensorGesture *m_shake;
     MDConfGroup* m_config = nullptr;
+    DisplaySettings* m_ds = nullptr;
 
     bool m_isOn;
 };

@@ -22,6 +22,8 @@
 #include <QDBusInterface>
 #include <QSensorGestureManager>
 
+#include <systemsettings/displaysettings.h>
+
 #include "accwatcher.h"
 
 #ifdef DBUS_IFACE_LEGACY
@@ -35,11 +37,13 @@ static const QString FLASHLIGHT_INTERFACE(FLASHLIGHT_SERVICE);
 
 static const QString SETTING_TURN_ON("turnOnOnShake");
 static const QString SETTING_TURN_OFF("turnOffOnShake");
+static const QString SETTING_BRIGHTNESS("changeBrightness");
 
 AccWatcher::AccWatcher(QObject *parent) :
     QObject(parent),
     m_shake(0)
 {
+    m_ds = new DisplaySettings();
     QSensorGestureManager manager;
     if (manager.gestureIds().contains("QtSensors.shake")) {
         m_shake = new QSensorGesture(QStringList("QtSensors.shake"), this);
@@ -107,11 +111,36 @@ void AccWatcher::accChanged()
     }
 
     QDBusInterface iface(FLASHLIGHT_SERVICE, FLASHLIGHT_PATH, FLASHLIGHT_INTERFACE);
-    if ( iface.isValid() && ((m_isOn && m_turnOff) || (!m_isOn && m_turnOn)) ) {
-        QDBusPendingCall call =  iface.asyncCall("toggleFlashlight");
+    if (iface.isValid()) {
+        if ((m_isOn && m_turnOff) || (!m_isOn && m_turnOn)) {
+            QDBusPendingCall call =  iface.asyncCall("toggleFlashlight");
+        }
+        if (m_changeBrightness) {
+             handleBrightness();
+        }
     }
 
     connect(m_shake, SIGNAL(shake()), this, SLOT(accChanged()));
+}
+
+void AccWatcher::handleBrightness()
+{
+    if (m_ds == nullptr) return;
+    static const int max = m_ds->maximumBrightness();
+    qDebug() << "Handling Brightness:"
+            << m_brightness << ":"
+            << m_ds->brightness()
+            << "/" << max;
+    if (m_ds->brightness() != max) {
+        qDebug() << "Handling Brightness: settings to max";
+        m_brightness = m_ds->brightness();
+        m_ds->setBrightness(max);
+    } else {
+        if (m_brightness != -1) {
+            qDebug() << "Handling Brightness: settings to saved";
+            m_ds->setBrightness(m_brightness);
+        }
+    }
 }
 
 void AccWatcher::updateSetting(const QString& key)
@@ -125,8 +154,10 @@ void AccWatcher::updateSettings()
     if (m_config == nullptr) return;
     m_turnOn  = m_config->value(SETTING_TURN_ON,  true).toBool();
     m_turnOff = m_config->value(SETTING_TURN_OFF, true).toBool();
+    m_changeBrightness = m_config->value(SETTING_BRIGHTNESS, false).toBool();
     qInfo() << "Read Settings from:" << m_config->path()
-            << "\nTurn on on shake:" << m_turnOn
-            << "\nTurn off on shake:" << m_turnOff << "\n";
+            << "\nTurn on flash on shake:" << m_turnOn
+            << "\nTurn off flash on shake:" << m_turnOff
+            << "\nChange brightness on shake:" << m_changeBrightness << "\n";
 
 }

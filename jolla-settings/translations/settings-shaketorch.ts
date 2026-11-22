@@ -52,5 +52,16 @@
         <source>When shaking is detected:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="settings_shaketorch_bright_desc">
+        <source>Set brightness to maximum on shake, revert when shaken again</source>
+        <oldsource>Adjust display brightness</oldsource>
+        <extracomment>description of the brightness switch</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="settings_shaketorch_bright_text">
+        <source>Adjust display brightness</source>
+        <extracomment>description of the brightness switch</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

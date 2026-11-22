@@ -11,6 +11,7 @@ Requires:  qt5-qtsensors-plugin-gestures-shake
 BuildRequires:  pkgconfig(Qt5DBus)
 BuildRequires:  pkgconfig(Qt5Gui)
 BuildRequires:  pkgconfig(Qt5Sensors)
+BuildRequires:  pkgconfig(systemsettings)
 BuildRequires:  qt5-qttools-linguist
 
 %description
