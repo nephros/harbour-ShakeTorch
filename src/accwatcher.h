@@ -36,6 +36,7 @@ private Q_SLOTS:
     void accChanged();
     void flashStateChanged(bool);
     void handleBrightness();
+    void handleLowPower();
 
     void updateSettings();
     void updateSetting(const QString& key);
@@ -51,6 +52,8 @@ private:
     DisplaySettings* m_ds = nullptr;
 
     bool m_isOn;
+
+    void init();
 };
 
 #endif // ACCWATCHER_H

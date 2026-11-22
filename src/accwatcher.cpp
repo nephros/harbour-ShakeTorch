@@ -21,6 +21,7 @@
 #include <QDBusReply>
 #include <QDebug>
 #include <QSensorGestureManager>
+#include <QTimer>
 
 #include <systemsettings/displaysettings.h>
 
@@ -43,16 +44,35 @@ static const QString SETTING_DISABLE("disableDetection");
 AccWatcher::AccWatcher(QObject *parent)
     : QObject(parent)
     , m_shake(0)
+    , m_ds(0)
 {
-    m_ds = new DisplaySettings();
+    m_config = new MDConfGroup(QStringLiteral("/apps/%1/%2")
+                    .arg(parent->property("organizationName").toString())
+                    .arg(parent->property("applicationName").toString())
+                    );
+    init();
+}
+
+AccWatcher::~AccWatcher()
+{
+    delete m_shake;
+    delete m_config;
+}
+
+void AccWatcher::init()
+{
+    bool ok = true;
     QSensorGestureManager manager;
     if (manager.gestureIds().contains("QtSensors.shake")) {
         m_shake = new QSensorGesture(QStringList("QtSensors.shake"), this);
-        m_shake->startDetection();
+//        m_shake->startDetection(); // handled in updateSettings
         connect(m_shake, SIGNAL(shake()), this, SLOT(accChanged()));
-        qInfo() << "Connected to shake gesture";
-    } else
-        qCritical() << "QtSensors.shake gesture is missing";
+        qDebug() << "Connected to shake gesture";
+    } else {
+        qCritical() << "QtSensors.shake gesture is missing"
+                    << "Suppored gestures:" << manager.gestureIds();
+        ok &= false;
+    }
 
     if (QDBusConnection::sessionBus().connect(
                     FLASHLIGHT_SERVICE,
@@ -60,24 +80,24 @@ AccWatcher::AccWatcher(QObject *parent)
                     FLASHLIGHT_INTERFACE,
                     QStringLiteral("flashlightOnChanged"), "b",
                     this, SLOT(flashStateChanged(bool)))) {
-        qInfo() << "Connected to flashlight change signal";
-    } else
+        qDebug() << "Connected to flashlight change signal";
+    } else {
         qCritical() << "Could not connect flashlight change signal";
+        ok &= false;
+    }
 
-    m_config = new MDConfGroup(QStringLiteral("/apps/%1/%2")
-                    .arg(parent->property("organizationName").toString())
-                    .arg(parent->property("applicationName").toString())
-                    );
-
-    connect(m_config, SIGNAL(valuesChanged()), this, SLOT(updateSettings()));
-    connect(m_config, SIGNAL(valueChanged(const QString&)), this, SLOT(updateSetting(const QString&)));
+    ok = ok && connect(m_config, SIGNAL(valuesChanged()), this, SLOT(updateSettings()));
+    ok = ok && connect(m_config, SIGNAL(valueChanged(const QString&)), this, SLOT(updateSetting(const QString&)));
     updateSettings();
-}
 
-AccWatcher::~AccWatcher()
-{
-    delete m_shake;
-    delete m_config;
+    connect(m_ds, SIGNAL(powerSaveModeForcedChanged()), this, SLOT(handleLowPower()));
+
+    if (ok) {
+        qInfo() << "OK, startup successful.";
+    } else { // retry
+        qWarning() << "Not all necessary components available. This will probably not work...";
+        QTimer::singleShot(2000, Qt::VeryCoarseTimer, this, SLOT(init()));
+    }
 }
 
 void AccWatcher::flashStateChanged(bool on)
@@ -127,6 +147,17 @@ void AccWatcher::accChanged()
     }
 
     connect(m_shake, SIGNAL(shake()), this, SLOT(accChanged()));
+}
+
+void AccWatcher::handleLowPower()
+{
+    if (m_ds->powerSaveModeForced()) {
+        if (m_shake->isActive())
+            m_shake->stopDetection();
+    } else {
+        if (!m_shake->isActive() && !m_disableDetection)
+            m_shake->startDetection();
+    }
 }
 
 void AccWatcher::handleBrightness()
